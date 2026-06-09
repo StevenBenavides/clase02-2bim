@@ -11,25 +11,27 @@ archivo = 'data/premios.csv'
 with open(archivo, 'r', encoding='utf-8') as f:
     lector = csv.DictReader(f)
     for fila in lector:
-        # Consultamos si el premio ya está en la base de datos
-        premio_existente = session.query(Premio).filter_by(nombre_premio=fila['nombre_premio']).first()
-    
-        if not premio_existente:
-            # Buscamos el objeto Serie por su título
-            serie_obj = session.query(Serie).filter_by(titulo=fila['serie']).first()
-            
-            if serie_obj:
+        serie_obj = session.query(Serie).filter_by(titulo=fila['serie']).first()
+        
+        if serie_obj:
+            # verificamos si este premio específico para esta serie ya existe
+            premio_existente = session.query(Premio).filter(
+                Premio.nombre_premio == fila['nombre_premio'],
+                Premio.anio == int(fila['anio']),
+                Premio.serie_id == serie_obj.id
+            ).first()
+
+            if not premio_existente:
                 nuevo_premio = Premio(
                     nombre_premio=fila['nombre_premio'],
                     categoria=fila['categoria'],
                     anio=int(fila['anio']),  
                     serie=serie_obj          
                 )
-                
                 session.add(nuevo_premio)
-                print("  Premio agregado: %s" % nuevo_premio)
+                print("  Premio agregado: '%s' a la serie '%s'" % (nuevo_premio, serie_obj.titulo))
             else:
-                print("  Serie no encontrada para el premio: '%s' - Serie: '%s'" % (fila['nombre_premio'], fila['serie']))
+                print("  Premio ya existente para la serie: '%s' - Premio: '%s'" % (serie_obj.titulo, fila['nombre_premio']))
         
 session.commit()
 print("\nDatos de premios ingresados correctamente")

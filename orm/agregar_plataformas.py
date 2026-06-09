@@ -2,13 +2,11 @@ import csv
 from sqlalchemy.orm import sessionmaker
 from modelo import engine, Plataforma, Pais
 
-# se importa información del archivo configuracion
 from config import cadena_base_datos
 
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Archivo CSV único que va a leer para cargar las plataformas
 archivo = 'data/plataformas.csv'
 
 with open(archivo, 'r', encoding='utf-8') as f:
@@ -18,11 +16,9 @@ with open(archivo, 'r', encoding='utf-8') as f:
         plataforma = session.query(Plataforma).filter_by(nombre=fila['nombre']).first()
         
         if not plataforma:
-            # Buscamos el pais por nombre
             pais = session.query(Pais).filter_by(nombre=fila['pais']).first()
             
             if pais:
-                # se crea un objeto de tipo Plataformas
                 nueva_plataforma = Plataforma()
                 nueva_plataforma.id = int(fila['id'])
                 nueva_plataforma.nombre = fila['nombre']

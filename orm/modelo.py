@@ -53,6 +53,19 @@ class Serie(Base):
 
     def __repr__(self):
         return f"Serie: {self.titulo}"
+    
+    def obtener_edad_actores(self):
+        edades = [e.edad for e in self.actores]
+        if len(edades) > 0:
+            suma = sum(edades)
+            promedio = suma/len(edades)
+            return promedio
+        else:
+            return 0
+    def obtener_premios(self):
+        return len(self.premios)
+
+
 
 class Actor(Base):
     __tablename__ = 'actor'
@@ -68,6 +81,7 @@ class Actor(Base):
 
     def __repr__(self):
         return f"Actor: {self.nombre}"
+    
 
 
 class Premio(Base):
